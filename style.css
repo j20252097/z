@@ -83,3 +83,21 @@ input,textarea{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(
 /* small helpers */
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
 
+/* tools */
+.tool-section{padding:2rem 1.5rem;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;margin-top:1rem}
+
+/* calculator */
+.calc{max-width:420px;margin:0 auto}
+.calc .display input{width:100%;padding:1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-size:1.25rem}
+.calc .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.75rem}
+.calc .keys button{padding:.8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--card-bg);color:var(--text);cursor:pointer}
+.calc .keys button.equals{grid-column:3/4;background:var(--accent);color:#fff}
+
+/* mahjong */
+.mahjong-controls{display:flex;gap:.5rem;margin-bottom:.75rem}
+.mahjong-board{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem}
+.mahjong-tile{background:var(--surface);border-radius:6px;padding:0.6rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;user-select:none;border:1px solid rgba(255,255,255,0.03)}
+.mahjong-tile.removed{visibility:hidden}
+.mahjong-tile.selected{outline:3px solid rgba(124,58,237,0.3)}
+
+
