@@ -33,34 +33,7 @@ themeToggle?.addEventListener('click', ()=>{
 	applyTheme(next);
 });
 
-// Gallery filter & modal
-const grid = document.getElementById('gallery-grid');
-const filterBtns = document.querySelectorAll('.filter-btn');
-filterBtns.forEach(btn=>btn.addEventListener('click', ()=>{
-	filterBtns.forEach(b=>b.classList.remove('active'));
-	btn.classList.add('active');
-	const f = btn.dataset.filter;
-	document.querySelectorAll('.grid-item').forEach(item=>{
-		const cat = item.dataset.category;
-		if(f==='*' || f===cat) item.style.display = '';
-		else item.style.display = 'none';
-	})
-}));
-
-// modal
-const modal = document.getElementById('modal');
-const modalImg = document.getElementById('modal-img');
-const modalClose = document.querySelector('.modal-close');
-grid?.addEventListener('click', e=>{
-	const item = e.target.closest('.grid-item');
-	if(!item) return;
-	const img = item.querySelector('img');
-	modalImg.src = img.src;
-	modalImg.alt = img.alt || '';
-	modal.setAttribute('aria-hidden','false');
-});
-modalClose?.addEventListener('click', ()=> modal.setAttribute('aria-hidden','true'));
-modal?.addEventListener('click', e=>{ if(e.target===modal) modal.setAttribute('aria-hidden','true') });
+// remove gallery/modal handlers (focus mode)
 
 // form validation
 // --- Blackjack game ---
@@ -77,6 +50,17 @@ let deck = [];
 let playerHand = [];
 let dealerHand = [];
 let inRound = false;
+let soundEnabled = true;
+
+// simple sounds (public domain short tones)
+const snd = {
+	deal: new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg'),
+	click: new Audio('https://actions.google.com/sounds/v1/buttons/button_press.ogg'),
+	win: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
+	lose: new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg')
+};
+
+function playSound(name){ if(!soundEnabled) return; try{ snd[name]?.currentTime=0; snd[name]?.play(); }catch(e){} }
 
 function createDeck(){
 	const suits = ['♠','♥','♦','♣'];
@@ -118,8 +102,9 @@ function renderCard(card){
 	const el = document.createElement('div');
 	el.className = 'card';
 	const isRed = card.suit==='♥' || card.suit==='♦';
-	el.innerHTML = `<div>${card.rank}</div><div>${card.suit}</div>`;
-	el.style.color = isRed ? '#b91c1c' : '#041527';
+	const front = document.createElement('div'); front.className='face front'; front.innerHTML = `<div>${card.rank}</div><div>${card.suit}</div>`; if(isRed) front.classList.add('red');
+	const back = document.createElement('div'); back.className='face back'; back.textContent = '';
+	el.appendChild(front); el.appendChild(back);
 	return el;
 }
 
@@ -129,9 +114,10 @@ function renderHands(hideDealerHole=true){
 	dealerHand.forEach((c,i)=>{
 		const el = renderCard(c);
 		if(i===0 && hideDealerHole && inRound){
-			el.innerHTML = '<div>?</div>';
-			el.style.background = 'linear-gradient(180deg,#334155,#0b1220)';
-			el.style.color = '#fff';
+			// show back for dealer hole
+			el.querySelector('.front').style.visibility='hidden';
+			el.querySelector('.back').textContent = '';
+			el.classList.add('flip');
 		}
 		dealerCardsEl.appendChild(el);
 	});
@@ -146,24 +132,30 @@ function log(msg){
 }
 
 function dealCard(to){
-	if(deck.length===0) deck = createDeck(); shuffle(deck);
+	if(deck.length===0) deck = createDeck();
 	const c = deck.pop();
 	to.push(c);
+	playSound('deal');
 }
 
 function startRound(){
 	deck = createDeck(); shuffle(deck);
 	playerHand = []; dealerHand = [];
 	inRound = true; bjLog.innerHTML='';
-	dealCard(playerHand); dealCard(dealerHand); dealCard(playerHand); dealCard(dealerHand);
-	renderHands(true);
-	log('ゲーム開始 — ヒットまたはスタンドを選択してください');
+	// deal animation sequence
+	const sequence = [() => { dealCard(playerHand); renderHands(true); },
+										() => { setTimeout(()=>{ dealCard(dealerHand); renderHands(true); }, 250); },
+										() => { setTimeout(()=>{ dealCard(playerHand); renderHands(true); }, 500); },
+										() => { setTimeout(()=>{ dealCard(dealerHand); renderHands(true); }, 750); }];
+	sequence.forEach((fn,i)=> setTimeout(fn, i*300));
+	setTimeout(()=>{ renderHands(true); log('ゲーム開始 — ヒットまたはスタンドを選択してください'); }, 1200);
 }
 
 function playerHit(){
-	if(!inRound) return; dealCard(playerHand); renderHands(true);
+	if(!inRound) return; dealCard(playerHand); renderHands(true); playSound('click');
 	const s = scoreHand(playerHand);
 	if(s>21){
+		playSound('lose');
 		endRound('バースト — あなたの負け');
 	}
 }
@@ -184,6 +176,7 @@ function endRound(msg){
 		else if(pScore===dScore) result='引き分け';
 		else result='あなたの負け';
 	}
+	if(result.includes('勝ち')) playSound('win'); else if(result.includes('負け')) playSound('lose');
 	log(result + ` (あなた ${pScore} - ディーラー ${dScore})`);
 }
 

@@ -10,8 +10,8 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-	margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
-	background:linear-gradient(180deg,var(--bg) 0%, #071022 100%);
+	margin:0;font-family:Poppins, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans JP', 'Yu Gothic', sans-serif;
+	background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.08), transparent), linear-gradient(180deg,var(--bg) 0%, #071022 100%);
 	color:var(--text);-webkit-font-smoothing:antialiased;
 }
 .container{max-width:1100px;margin:0 auto;padding:1.5rem}
@@ -95,10 +95,29 @@ input,textarea{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(
 .bj-area{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
 .panel{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
 .card-row{display:flex;gap:.5rem;min-height:120px;align-items:center}
-.card{width:80px;height:120px;border-radius:8px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
+.card{width:96px;height:140px;border-radius:10px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 12px 30px rgba(2,6,23,0.6);position:relative;transform-origin:center}
+.card .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px}
+.card.front{background:linear-gradient(180deg,#fff,#f3f4f6)}
+.card.back{background:linear-gradient(180deg,#1f2937,#0b1220);background-image:repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 12px);color:#fff}
+.card.red{color:#b91c1c}
+.card.flip{animation:flip 400ms ease forwards}
+@keyframes flip{from{transform:rotateY(0deg)}to{transform:rotateY(180deg)}}
+
+/* subtle shadow for table */
+.panel{box-shadow:inset 0 1px 0 rgba(255,255,255,0.02), 0 8px 30px rgba(2,6,23,0.5)}
+
+/* hide gallery remnants */
+.gallery, .features{display:none}
 .score{margin-top:.75rem;color:var(--muted)}
 .bj-controls{display:flex;gap:.5rem;margin-top:.75rem}
-.bj-log{margin-top:.75rem;color:var(--muted);min-height:40px}
+.bj-log{margin-top:.75rem;color:var(--muted);min-height:60px}
+
+/* sound control */
+.sound-toggle{position:fixed;right:16px;bottom:16px;background:var(--card-bg);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+
+/* footer */
+.site-footer .container{display:flex;justify-content:center;align-items:center}
+.site-footer{padding:1rem 0;text-align:center;color:var(--muted)}
 
 
 
