@@ -1,20 +1,11 @@
 :root{
-	--bg:#0f1724;
+	--bg:#071022;
 	--surface:#0b1220;
 	--muted:#94a3b8;
 	--accent:#7c3aed;
-	--glass: rgba(255,255,255,0.04);
-	--card-bg: rgba(255,255,255,0.03);
+	--glass: rgba(255,255,255,0.03);
+	--card-bg: rgba(255,255,255,0.02);
 	--text:#e6eef8;
-}
-:root.light{
-	--bg:#f7f9fc;
-	--surface:#ffffff;
-	--muted:#475569;
-	--accent:#065f46;
-	--glass: rgba(0,0,0,0.04);
-	--card-bg: rgba(0,0,0,0.03);
-	--text:#0b1220;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -99,5 +90,15 @@ input,textarea{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(
 .mahjong-tile{background:var(--surface);border-radius:6px;padding:0.6rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;user-select:none;border:1px solid rgba(255,255,255,0.03)}
 .mahjong-tile.removed{visibility:hidden}
 .mahjong-tile.selected{outline:3px solid rgba(124,58,237,0.3)}
+
+/* Blackjack styles */
+.bj-area{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.panel{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+.card-row{display:flex;gap:.5rem;min-height:120px;align-items:center}
+.card{width:80px;height:120px;border-radius:8px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
+.score{margin-top:.75rem;color:var(--muted)}
+.bj-controls{display:flex;gap:.5rem;margin-top:.75rem}
+.bj-log{margin-top:.75rem;color:var(--muted);min-height:40px}
+
 
 

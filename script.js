@@ -63,140 +63,133 @@ modalClose?.addEventListener('click', ()=> modal.setAttribute('aria-hidden','tru
 modal?.addEventListener('click', e=>{ if(e.target===modal) modal.setAttribute('aria-hidden','true') });
 
 // form validation
-// --- Calculator ---
-const calcDisplay = document.getElementById('calc-display');
-const calc = document.getElementById('calc');
-if(calc){
-	calc.addEventListener('click', e=>{
-		const btn = e.target.closest('button');
-		if(!btn) return;
-		const action = btn.dataset.action;
-		const value = btn.dataset.value;
-		const fn = btn.dataset.fn;
+// --- Blackjack game ---
+const bjNew = document.getElementById('bj-new');
+const bjHit = document.getElementById('bj-hit');
+const bjStand = document.getElementById('bj-stand');
+const dealerCardsEl = document.getElementById('dealer-cards');
+const playerCardsEl = document.getElementById('player-cards');
+const dealerScoreEl = document.getElementById('dealer-score');
+const playerScoreEl = document.getElementById('player-score');
+const bjLog = document.getElementById('bj-log');
 
-		if(action==='clear'){
-			calcDisplay.value = '';
-			return;
-		}
-		if(action==='back'){
-			calcDisplay.value = calcDisplay.value.slice(0,-1);
-			return;
-		}
-		if(action==='eval'){
-			// safe eval: allow digits, operators and Math names
-			try{
-				const expr = calcDisplay.value.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-');
-				// basic whitelist: digits, operators, parentheses, dot, letters
-				if(!/^[0-9+\-*/().^ %A-Za-z,]+$/.test(expr)) throw new Error('不正な文字');
-				// replace ^ with Math.pow usage if present: a^b => Math.pow(a,b)
-				const safeExpr = expr.replace(/(\d+(?:\.\d+)?|\([^()]+\))\s*\^\s*(\d+(?:\.\d+)?|\([^()]+\))/g, 'Math.pow($1,$2)');
-				// eslint-disable-next-line no-new-func
-				const fnc = new Function('Math', 'return ' + safeExpr);
-				const res = fnc(Math);
-				calcDisplay.value = String(res);
-			}catch(err){
-				alert('計算式にエラーがあります');
-			}
-			return;
-		}
+let deck = [];
+let playerHand = [];
+let dealerHand = [];
+let inRound = false;
 
-		if(fn){
-			// apply function to current value
-			try{
-				const v = parseFloat(calcDisplay.value || '0');
-				// map Math.pow button to square if no argument
-				if(fn==='Math.pow'){
-					calcDisplay.value = String(Math.pow(v,2));
-				} else {
-					const result = Function('Math','v','return ' + fn + '(v)')(Math,v);
-					calcDisplay.value = String(result);
-				}
-			}catch(e){ alert('関数適用エラー') }
-			return;
+function createDeck(){
+	const suits = ['♠','♥','♦','♣'];
+	const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+	const d = [];
+	for(const s of suits){
+		for(const r of ranks){
+			d.push({suit:s,rank:r});
 		}
-
-		if(value){
-			calcDisplay.value = (calcDisplay.value || '') + value;
-		}
-	});
+	}
+	return d;
 }
 
-// --- Mahjong simple pair matching ---
-const mahjongBoard = document.getElementById('mahjong-board');
-const shuffleBtn = document.getElementById('shuffle-tiles');
-const resetBtn = document.getElementById('reset-tiles');
-
-function generateTiles(){
-	// create 32 pairs (64 tiles) but for small demo use 32 tiles (16 pairs)
-	const symbols = ['🀄','🀅','🀆','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀐','🀑','🀒','🀓'];
-	const pairs = symbols.concat(symbols); // 32
-	// shuffle
-	for(let i=pairs.length-1;i>0;i--){
+function shuffle(d){
+	for(let i=d.length-1;i>0;i--){
 		const j = Math.floor(Math.random()*(i+1));
-		[pairs[i],pairs[j]] = [pairs[j],pairs[i]];
+		[d[i],d[j]]=[d[j],d[i]];
 	}
-	return pairs;
 }
 
-let tiles = [];
-let selected = [];
-
-function renderBoard(){
-	if(!mahjongBoard) return;
-	mahjongBoard.innerHTML = '';
-	tiles.forEach((t,idx)=>{
-		const d = document.createElement('div');
-		d.className = 'mahjong-tile';
-		d.tabIndex = 0;
-		d.dataset.index = idx;
-		d.textContent = t;
-		mahjongBoard.appendChild(d);
-	});
+function cardValue(card){
+	if(card.rank==='A') return 11;
+	if(['J','Q','K'].includes(card.rank)) return 10;
+	return Number(card.rank);
 }
 
-function initMahjong(){
-	tiles = generateTiles();
-	selected = [];
-	renderBoard();
-}
-
-mahjongBoard?.addEventListener('click', e=>{
-	const t = e.target.closest('.mahjong-tile');
-	if(!t) return;
-	const idx = Number(t.dataset.index);
-	if(t.classList.contains('removed')) return;
-	if(selected.includes(idx)){
-		selected = selected.filter(i=>i!==idx);
-		t.classList.remove('selected');
-		return;
+function scoreHand(hand){
+	let total = 0; let aces = 0;
+	for(const c of hand){
+		if(c.rank==='A'){ aces++; total+=11; }
+		else if(['J','Q','K'].includes(c.rank)) total+=10;
+		else total+=Number(c.rank);
 	}
-	selected.push(idx);
-	t.classList.add('selected');
-	if(selected.length===2){
-		const [a,b] = selected;
-		if(tiles[a]===tiles[b]){
-			// match: remove
-			const aEl = mahjongBoard.querySelector(`[data-index="${a}"]`);
-			const bEl = mahjongBoard.querySelector(`[data-index="${b}"]`);
-			aEl.classList.add('removed'); bEl.classList.add('removed');
-			aEl.textContent = '';
-			bEl.textContent = '';
-		} else {
-			// no match: brief highlight then unselect
-			setTimeout(()=>{
-				mahjongBoard.querySelector(`[data-index="${a}"]`)?.classList.remove('selected');
-				mahjongBoard.querySelector(`[data-index="${b}"]`)?.classList.remove('selected');
-			},400);
+	while(total>21 && aces>0){ total-=10; aces--; }
+	return total;
+}
+
+function renderCard(card){
+	const el = document.createElement('div');
+	el.className = 'card';
+	const isRed = card.suit==='♥' || card.suit==='♦';
+	el.innerHTML = `<div>${card.rank}</div><div>${card.suit}</div>`;
+	el.style.color = isRed ? '#b91c1c' : '#041527';
+	return el;
+}
+
+function renderHands(hideDealerHole=true){
+	dealerCardsEl.innerHTML = '';
+	playerCardsEl.innerHTML = '';
+	dealerHand.forEach((c,i)=>{
+		const el = renderCard(c);
+		if(i===0 && hideDealerHole && inRound){
+			el.innerHTML = '<div>?</div>';
+			el.style.background = 'linear-gradient(180deg,#334155,#0b1220)';
+			el.style.color = '#fff';
 		}
-		selected = [];
+		dealerCardsEl.appendChild(el);
+	});
+	playerHand.forEach(c=> playerCardsEl.appendChild(renderCard(c)));
+	dealerScoreEl.textContent = inRound ? (hideDealerHole? '?' : String(scoreHand(dealerHand))) : '--';
+	playerScoreEl.textContent = String(scoreHand(playerHand));
+}
+
+function log(msg){
+	if(!bjLog) return;
+	const p = document.createElement('div'); p.textContent = msg; bjLog.prepend(p);
+}
+
+function dealCard(to){
+	if(deck.length===0) deck = createDeck(); shuffle(deck);
+	const c = deck.pop();
+	to.push(c);
+}
+
+function startRound(){
+	deck = createDeck(); shuffle(deck);
+	playerHand = []; dealerHand = [];
+	inRound = true; bjLog.innerHTML='';
+	dealCard(playerHand); dealCard(dealerHand); dealCard(playerHand); dealCard(dealerHand);
+	renderHands(true);
+	log('ゲーム開始 — ヒットまたはスタンドを選択してください');
+}
+
+function playerHit(){
+	if(!inRound) return; dealCard(playerHand); renderHands(true);
+	const s = scoreHand(playerHand);
+	if(s>21){
+		endRound('バースト — あなたの負け');
 	}
-});
+}
 
-shuffleBtn?.addEventListener('click', ()=>{ initMahjong(); });
-resetBtn?.addEventListener('click', ()=>{ initMahjong(); });
+function dealerPlay(){
+	// simple dealer AI: hit until 17 or more
+	while(scoreHand(dealerHand)<17){ dealCard(dealerHand); }
+}
 
-// init on load
-initMahjong();
+function endRound(msg){
+	inRound = false; dealerPlay(); renderHands(false);
+	const pScore = scoreHand(playerHand); const dScore = scoreHand(dealerHand);
+	let result = msg;
+	if(!msg){
+		if(pScore>21) result='バースト — あなたの負け';
+		else if(dScore>21) result='ディーラーがバースト — あなたの勝ち';
+		else if(pScore> dScore) result='あなたの勝ち';
+		else if(pScore===dScore) result='引き分け';
+		else result='あなたの負け';
+	}
+	log(result + ` (あなた ${pScore} - ディーラー ${dScore})`);
+}
+
+bjNew?.addEventListener('click', ()=> startRound());
+bjHit?.addEventListener('click', ()=> playerHit());
+bjStand?.addEventListener('click', ()=>{ if(!inRound) return; endRound(); });
 
 // footer year
 document.getElementById('year').textContent = new Date().getFullYear();

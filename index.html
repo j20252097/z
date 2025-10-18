@@ -10,22 +10,20 @@
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
 	</head>
 	<body>
-		<header class="site-header">
-			<div class="container header-inner">
-				<a class="brand" href="#">WADO Support</a>
-						<nav class="main-nav">
-							<a href="#hero">ホーム</a>
-							<a href="#features">機能</a>
-							<a href="#gallery">ギャラリー</a>
-							<a href="#calculator">電卓</a>
-							<a href="#mahjong">麻雀</a>
-						</nav>
-				<div class="controls">
-					<button id="theme-toggle" aria-label="Toggle theme">🌙</button>
-					<button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+			<header class="site-header">
+				<div class="container header-inner">
+					<a class="brand" href="#">電子情報SPツール</a>
+					<nav class="main-nav">
+						<a href="#hero">ホーム</a>
+						<a href="#features">機能</a>
+						<a href="#gallery">ギャラリー</a>
+						<a href="#blackjack">ブラックジャック</a>
+					</nav>
+					<div class="controls">
+						<button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+					</div>
 				</div>
-			</div>
-		</header>
+			</header>
 
 		<main>
 			<section id="hero" class="hero">
@@ -85,56 +83,29 @@
 				</div>
 			</section>
 					<!-- Calculator section -->
-					<section id="calculator" class="container tool-section" data-aos="fade-up">
-						<h2>関数電卓</h2>
-						<div class="calc" id="calc">
-							<div class="display"><input id="calc-display" readonly aria-label="計算結果"></div>
-							<div class="keys">
-								<button data-action="clear">C</button>
-								<button data-action="back">←</button>
-								<button data-value="(">(</button>
-								<button data-value=")">)</button>
-
-								<button data-value="7">7</button>
-								<button data-value="8">8</button>
-								<button data-value="9">9</button>
-								<button data-value="/">÷</button>
-
-								<button data-value="4">4</button>
-								<button data-value="5">5</button>
-								<button data-value="6">6</button>
-								<button data-value="*">×</button>
-
-								<button data-value="1">1</button>
-								<button data-value="2">2</button>
-								<button data-value="3">3</button>
-								<button data-value="-">−</button>
-
-								<button data-value="0">0</button>
-								<button data-value=".">.</button>
-								<button data-action="eval" class="equals">=</button>
-								<button data-value="+">+</button>
-
-								<button data-fn="Math.sin">sin</button>
-								<button data-fn="Math.cos">cos</button>
-								<button data-fn="Math.tan">tan</button>
-								<button data-fn="Math.log">log</button>
-								<button data-fn="Math.sqrt">√</button>
-								<button data-fn="Math.pow">^</button>
-							</div>
-						</div>
-					</section>
-
-					<!-- Mahjong (simple pair-matching) -->
-					<section id="mahjong" class="container tool-section" data-aos="fade-up">
-						<h2>麻雀ソリティア（簡易）</h2>
-						<p>同じ牌を2つ選んで消していくシンプルなソリティアです（ブロック判定は簡易実装）。</p>
-						<div class="mahjong-controls">
-							<button id="shuffle-tiles" class="btn">シャッフル</button>
-							<button id="reset-tiles" class="btn ghost">リセット</button>
-						</div>
-						<div id="mahjong-board" class="mahjong-board" aria-live="polite"></div>
-					</section>
+							<!-- Blackjack section -->
+							<section id="blackjack" class="container tool-section" data-aos="fade-up">
+								<h2>ブラックジャック</h2>
+								<p>プレイヤー対ディーラーのブラックジャック。見た目にこだわった UI で練習できます。</p>
+								<div class="bj-area">
+									<div class="dealer panel">
+										<h3>ディーラー</h3>
+										<div id="dealer-cards" class="card-row"></div>
+										<div class="score" id="dealer-score">--</div>
+									</div>
+									<div class="player panel">
+										<h3>プレイヤー</h3>
+										<div id="player-cards" class="card-row"></div>
+										<div class="score" id="player-score">--</div>
+									</div>
+								</div>
+								<div class="bj-controls">
+									<button id="bj-new" class="btn primary">新しいゲーム</button>
+									<button id="bj-hit" class="btn">ヒット</button>
+									<button id="bj-stand" class="btn ghost">スタンド</button>
+								</div>
+								<div id="bj-log" class="bj-log" aria-live="polite"></div>
+							</section>
 		</main>
 
 		<footer class="site-footer">
